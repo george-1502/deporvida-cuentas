@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeporVida - Sistema de Cuentas de Cobro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* LOGIN SCREEN */
+        .login-container {
+            max-width: 450px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .login-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 50px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+        }
+
+        .btn {
+            padding: 16px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 60, 114, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #c62828;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            color: #1976d2;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            color: #f57c00;
+        }
+
+        /* DATA DISPLAY SCREEN */
+        .data-card {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .data-row {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: #666;
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        .data-value {
+            color: #333;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        /* UPLOAD SCREEN */
+        .upload-section {
+            margin-bottom: 35px;
+        }
+
+        .upload-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doc-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .doc-item.uploaded {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .doc-item.missing {
+            border-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .doc-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .doc-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-uploaded {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .doc-nomenclature {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-input-custom {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #2a5298;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .file-input-custom:hover {
+            background: #1e3c72;
+        }
+
+        .btn-preview {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .btn-preview:hover {
+            background: #45a049;
+        }
+
+        .btn-preview:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-rename {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-rename:hover {
+            background: #f57c00;
+        }
+
+        .validation-error {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #c62828;
+        }
+
+        .validation-success {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #2e7d32;
+        }
+
+        .validation-warning {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #f57c00;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-close:hover {
+            color: #000;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .file-info.show {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-icon {
+            width: 30px;
+            height: 30px;
+            background: #2a5298;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .btn-remove {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-remove:hover {
+            background: #ff3838;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .buttons button {
+            flex: 1;
+        }
+
+        /* PROGRESS */
+        .progress-container {
+            background: #f0f0f0;
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* LOADING */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2a5298;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* SUCCESS SCREEN */
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 70px;
+            color: white;
+        }
+
+        .tracking-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .tracking-number {
+            font-size: 28px;
+            color: #2a5298;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .data-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .data-label {
+                width: 100%;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏃 DeporVida</h1>
+            <p class="subtitle">Sistema de Cuentas de Cobro - Subsecretaría de Fomento</p>
+        </div>
+
+        <div class="content">
+            <!-- SCREEN 1: LOGIN -->
+            <div class="screen active" id="screenLogin">
+                <div class="login-container">
+                    <div class="login-icon">👤</div>
+                    <h2 style="margin-bottom: 15px; color: #333;">Bienvenido</h2>
+                    <p style="color: #666; margin-bottom: 30px;">Ingresa tu número de cédula para continuar</p>
+
+                    <div id="alertLogin"></div>
+
+                    <div class="form-group">
+                        <label for="cedula">Número de Cédula</label>
+                        <input 
+                            type="number" 
+                            id="cedula" 
+                            placeholder="Ej: 1130590578"
+                            onkeypress="if(event.key === 'Enter') verificarCedula()"
+                        >
+                    </div>
+
+                    <button class="btn btn-primary" onclick="verificarCedula()">
+                        Ingresar →
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCREEN 2: DATA DISPLAY -->
+            <div class="screen" id="screenData">
+                <h2 style="margin-bottom: 25px; color: #333;">📋 Tus Datos</h2>
+
+                <div class="alert alert-info">
+                    <strong>Verifica que tu información sea correcta.</strong> Si encuentras algún error, por favor comunícate con tu coordinador.
+                </div>
+
+                <div class="data-card">
+                    <div class="data-row">
+                        <div class="data-label">Nombre Completo:</div>
+                        <div class="data-value" id="dataNombre"></div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Cédula:</div>
+                        <div class="data-value" id="dataCedula"></div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Número de Contrato:</div>
+                        <div class="data-value" id="dataContrato"></div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Rol:</div>
+                        <div class="data-value" id="dataRol"></div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Teléfono:</div>
+                        <div class="data-value" id="dataTelefono"></div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Correo Electrónico:</div>
+                        <div class="data-value" id="dataCorreo"></div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Dirección:</div>
+                        <div class="data-value" id="dataDireccion"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="selectCuota">Selecciona la Cuota que vas a Presentar *</label>
+                    <select id="selectCuota" onchange="actualizarDocumentos()">
+                        <option value="">-- Selecciona una cuota --</option>
+                        <option value="C1">Cuota 1 (Primera cuota)</option>
+                        <option value="C2">Cuota 2 (Segunda cuota)</option>
+                        <option value="C3">Cuota 3 (Tercera cuota)</option>
+                        <option value="C4">Cuota 4 (Cuarta cuota)</option>
+                    </select>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-secondary" onclick="cerrarSesion()">
+                        ← Salir
+                    </button>
+                    <button class="btn btn-primary" onclick="irACargaDocumentos()" id="btnContinuar" disabled>
+                        Continuar →
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCREEN 3: UPLOAD DOCUMENTS -->
+            <div class="screen" id="screenUpload">
+                <div class="progress-container">
+                    <div class="progress-bar" id="uploadProgress"></div>
+                </div>
+
+                <h2 style="margin-bottom: 15px; color: #333;">📤 Cargar Documentos</h2>
+                <p style="color: #666; margin-bottom: 25px;">
+                    Cuota: <strong id="uploadCuota"></strong>
+                </p>
+
+                <div class="alert alert-warning">
+                    <strong>Importante:</strong> Debes cargar TODOS los documentos obligatorios con la nomenclatura exacta antes de enviar.
+                </div>
+
+                <div class="upload-section" id="documentsContainer">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+
+                <div id="alertUpload"></div>
+
+                <div class="buttons">
+                    <button class="btn btn-secondary" onclick="volverADatos()">
+                        ← Atrás
+                    </button>
+                    <button class="btn btn-primary" onclick="enviarDocumentos()" id="btnEnviar" disabled>
+                        Enviar Documentos 🚀
+                    </button>
+                </div>
+            </div>
+
+            <!-- LOADING SCREEN -->
+            <div class="loading" id="loadingScreen">
+                <div class="spinner"></div>
+                <h3 style="color: #2a5298; margin-bottom: 15px;">Subiendo tus documentos...</h3>
+                <p style="color: #666;">Por favor espera, esto puede tomar unos momentos</p>
+                <p id="loadingText" style="margin-top: 20px; font-weight: 600; color: #333;"></p>
+            </div>
+
+            <!-- SUCCESS SCREEN -->
+            <div class="screen" id="screenSuccess">
+                <div style="text-align: center; padding: 20px;">
+                    <div class="success-icon">✓</div>
+                    <h2 style="color: #4caf50; margin-bottom: 20px;">¡Cuenta de Cobro Enviada!</h2>
+                    <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+                        Tus documentos han sido cargados exitosamente al sistema
+                    </p>
+
+                    <div class="tracking-box">
+                        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">Número de Seguimiento:</p>
+                        <div class="tracking-number" id="trackingNumber"></div>
+                    </div>
+
+                    <div class="alert alert-success" style="text-align: left; margin: 30px 0;">
+                        <strong>Próximos Pasos:</strong>
+                        <ul style="margin-top: 12px; padding-left: 25px; line-height: 1.8;">
+                            <li>Recibirás confirmación por correo electrónico</li>
+                            <li>Tu cuenta será revisada por el equipo de supervisión</li>
+                            <li>Serás notificado si se requiere alguna corrección</li>
+                            <li>Guarda tu número de seguimiento para futuras consultas</li>
+                        </ul>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="location.reload()" style="max-width: 300px; margin: 0 auto;">
+                        Cargar Otra Cuenta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Vista Previa de Imágenes -->
+    <div id="previewModal" class="modal" onclick="if(event.target === this) cerrarModal()">
+        <div class="modal-content">
+            <span class="modal-close" onclick="cerrarModal()">&times;</span>
+            <h2 style="margin-bottom: 20px;">Vista Previa</h2>
+            <img id="previewImage" style="max-width: 100%; height: auto;" alt="Vista previa">
+            <p id="previewCaption" style="text-align: center; margin-top: 15px; color: #666;"></p>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // BASE DE DATOS DE CONTRATISTAS (Se cargará desde JSON)
+        // ============================================================================
+        
+        let contratistaActual = null;
+        let documentosRequeridos = [];
+        let archivosSubidos = {};
+
+        // BASE DE DATOS DE CONTRATISTAS - EMBEBIDA
+        const DATABASE_CONTRATISTAS = [{"cedula":"76316617","nombre":"JORGE ARMANDO HOYOS FERNANDEZ","programa":"DEPORVIDA","rol":"ASISTENCIAL","contrato_completo":"4162.010.26.1.0479-2026","contrato":"0479","telefono":"3192783636","correo":"jorgehoyos732@gmail.com","direccion":"CL 49 A 26 C 77 BRR EL BOSQUE","cdp":"3500000001","rpc":"4500000001","cuotas":"4","honorarios":"2271000","objeto_contractual":"Prestación de servicios de apoyo a la gestión en la Secretaría del Deporte y la Recreación del proyecto denominado Apoyo a la iniciación y formación deportiva en Santiago de Cali BP - 26005288","obligaciones":"1.Apoyar en la realización de acciones para la iniciación y formación deportiva. 2.Brindar apoyo administrativo. 3.Asistir a reuniones y capacitaciones. 4.Brindar apoyo logístico. 5.Las demás relacionadas con el desarrollo del objeto contractual.","link_evidencias":"https://drive.google.com/drive/folders/JORGE_HOYOS","consecutivo_c1":"999","consecutivo_c2":"1999","consecutivo_c3":"","consecutivo_c4":""},{"cedula":"89003501","nombre":"FRANCISCO JAVIER CASTAÑO ESCOBAR","programa":"DEPORVIDA","rol":"MONITOR","contrato_completo":"4162.010.26.1.0272-2026","contrato":"0272","telefono":"3147004034","correo":"fikocas@gmail.com","direccion":"CR 35 A 12 A 96 BRR OLIMPICO","cdp":"3500255838","rpc":"4500398400","cuotas":"4","honorarios":"2271000","objeto_contractual":"Prestación de servicios de apoyo a la gestión en\n la Secretaría del Deporte y la Recreación del proyecto \ndenominado Apoyo a la iniciación y formación deportiva \nen Santiago de Cali BP - 26005288","obligaciones":"1.Apoyar en la realización de acciones para la iniciación y formación deportivaa traves de las jornadas y eventos realizados en campo, para la intervención con los diferentes tipos de población que maneja el proyecto, así como al proceso de socialización y a la vinculación de la población beneficiaría del Proyecto.\n\n2.Brindar apoyo y garantízar a través de bases de información verificables, el cumplimiento de las metas establecidas en cantidad de grupos y beneficiarios a partir de la ejecución contractual en el programa institucional asignado y/o como apoyo en cualquiera de las estrategias propias de la sub secretaría de fomento deportivo en la ciudad de cali y corregimientos.\n\n3.Asistir o brindar apoyo en reuniones, capacitaciones o espacios formativos convocados por el área de Fomento, o que estén directamente relacionados con las actividades del cargo y el desarrollo del programa.\n\n4.Brindar apoyo en actividades operativas, logísticas o asistenciales de carácter misional, requeridas por la Secretaría del Deporte y la Recreación, en cumplimiento del objeto contractual.\n\n5.Las demás relacionadas con el desarrollo del objeto contractual.","link_evidencias":"https://drive.google.com/drive/folders/1kj9zsBj7bzLryoO_D_oRs1xYgyd0U4aD?usp=sharing","consecutivo_c1":"597","consecutivo_c2":"1472","consecutivo_c3":"","consecutivo_c4":""},{"cedula":"1143877859","nombre":"NICOLAS ANTONIO MUÑOZ CARVAJAL","programa":"DEPORVIDA","rol":"MONITOR","contrato_completo":"4162.010.26.1.0298-2026","contrato":"0298","telefono":"3105702601","correo":"namunoz.99@gmail.com","direccion":"VEREDA SAN MIGUEL","cdp":"3500255872","rpc":"4500400023","cuotas":"4","honorarios":"2271000","objeto_contractual":"Prestación de servicios de apoyo a la gestión en\n la Secretaría del Deporte y la Recreación del proyecto \ndenominado Apoyo a la iniciación y formación deportiva \nen Santiago de Cali BP - 26005288","obligaciones":"1.Apoyar en la realización de acciones para la iniciación y formación deportivaa traves de las jornadas y eventos realizados en campo, para la intervención con los diferentes tipos de población que maneja el proyecto, así como al proceso de socialización y a la vinculación de la población beneficiaría del Proyecto.\n\n2.Brindar apoyo y garantízar a través de bases de información verificables, el cumplimiento de las metas establecidas en cantidad de grupos y beneficiarios a partir de la ejecución contractual en el programa institucional asignado y/o como apoyo en cualquiera de las estrategias propias de la sub secretaría de fomento deportivo en la ciudad de cali y corregimientos.\n\n3.Asistir o brindar apoyo en reuniones, capacitaciones o espacios formativos convocados por el área de Fomento, o que estén directamente relacionados con las actividades del cargo y el desarrollo del programa.\n\n4.Brindar apoyo en actividades operativas, logísticas o asistenciales de carácter misional, requeridas por la Secretaría del Deporte y la Recreación, en cumplimiento del objeto contractual.\n\n5.Las demás relacionadas con el desarrollo del objeto contractual.","link_evidencias":"https://drive.google.com/drive/folders/1URCR92ZTxPrpVdJdTsHDtEaq_MyRiiS9?usp=drive_link","consecutivo_c1":"221","consecutivo_c2":"1248","consecutivo_c3":"","consecutivo_c4":""},{"cedula":"16288344","nombre":"PAULO CESAR LERMA WEIR","programa":"DEPORVIDA","rol":"MONITOR","contrato_completo":"4162.010.26.1.0299-2026","contrato":"0299","telefono":"3168141821","correo":"paulolermaweir@gmail.com","direccion":"CL 47 B NORTE 3 G N 21","cdp":"3500255873","rpc":"4500399507","cuotas":"4","honorarios":"2271000","objeto_contractual":"Prestación de servicios de apoyo a la gestión en\n la Secretaría del Deporte y la Recreación del proyecto \ndenominado Apoyo a la iniciación y formación deportiva \nen Santiago de Cali BP - 26005288","obligaciones":"1.Apoyar en la realización de acciones para la iniciación y formación deportivaa traves de las jornadas y eventos realizados en campo, para la intervención con los diferentes tipos de población que maneja el proyecto, así como al proceso de socialización y a la vinculación de la población beneficiaría del Proyecto.\n\n2.Brindar apoyo y garantízar a través de bases de información verificables, el cumplimiento de las metas establecidas en cantidad de grupos y beneficiarios a partir de la ejecución contractual en el programa institucional asignado y/o como apoyo en cualquiera de las estrategias propias de la sub secretaría de fomento deportivo en la ciudad de cali y corregimientos.\n\n3.Asistir o brindar apoyo en reuniones, capacitaciones o espacios formativos convocados por el área de Fomento, o que estén directamente relacionados con las actividades del cargo y el desarrollo del programa.\n\n4.Brindar apoyo en actividades operativas, logísticas o asistenciales de carácter misional, requeridas por la Secretaría del Deporte y la Recreación, en cumplimiento del objeto contractual.\n\n5.Las demás relacionadas con el desarrollo del objeto contractual.","link_evidencias":"https://drive.google.com/drive/folders/1UibvxRg-6X4mrSZ-FjQY4NWWnl6ixPRu?usp=drive_link","consecutivo_c1":"222","consecutivo_c2":"1530","consecutivo_c3":"","consecutivo_c4":""},{"cedula":"16226465","nombre":"CARLOS HUGO OVIEDO PELAEZ","programa":"DEPORVIDA","rol":"MONITOR","contrato_completo":"4162.010.26.1.0300-2026","contrato":"0300","telefono":"3117160704","correo":"choviedo5@gmail.com","direccion":"CL 9 F 23 A 67 BRR BRETAÑA","cdp":"3500255876","rpc":"4500399059","cuotas":"4","honorarios":"2271000","objeto_contractual":"Prestación de servicios de apoyo a la gestión en\n la Secretaría del Deporte y la Recreación del proyecto \ndenominado Apoyo a la iniciación y formación deportiva \nen Santiago de Cali BP - 26005288","obligaciones":"1.Apoyar en la realización de acciones para la iniciación y formación deportivaa traves de las jornadas y eventos realizados en campo, para la intervención con los diferentes tipos de población que maneja el proyecto, así como al proceso de socialización y a la vinculación de la población beneficiaría del Proyecto.\n\n2.Brindar apoyo y garantízar a través de bases de información verificables, el cumplimiento de las metas establecidas en cantidad de grupos y beneficiarios a partir de la ejecución contractual en el programa institucional asignado y/o como apoyo en cualquiera de las estrategias propias de la sub secretaría de fomento deportivo en la ciudad de cali y corregimientos.\n\n3.Asistir o brindar apoyo en reuniones, capacitaciones o espacios formativos convocados por el área de Fomento, o que estén directamente relacionados con las actividades del cargo y el desarrollo del programa.\n\n4.Brindar apoyo en actividades operativas, logísticas o asistenciales de carácter misional, requeridas por la Secretaría del Deporte y la Recreación, en cumplimiento del objeto contractual.\n\n5.Las demás relacionadas con el desarrollo del objeto contractual.","link_evidencias":"https://drive.google.com/drive/folders/11yPQvX3etOMnUlnqPDMsvRIvJVVvGAbe?usp=drive_link","consecutivo_c1":"223","consecutivo_c2":"1249","consecutivo_c3":"","consecutivo_c4":""}];
+
+        console.log(`✓ Base de datos embebida cargada: ${DATABASE_CONTRATISTAS.length} contratistas`);
+
+        // ============================================================================
+        // CONFIGURACIÓN DE DOCUMENTOS
+        // ============================================================================
+
+        const CONFIG_DOCUMENTOS = {
+            C1: [
+                { nombre: 'RPC', nomenclatura: 'RPC-{contrato}-{nombre}', requerido: true, descripcion: 'Registro Presupuestal del Compromiso' },
+                { nombre: 'CLAUSULADO', nomenclatura: 'CLAUSULADO-{contrato}-{nombre}', requerido: true, descripcion: 'Clausulado del Contrato' },
+                { nombre: 'DS', nomenclatura: 'DS-4162-01-{contrato}-{nombre}', requerido: true, descripcion: 'Designación de Supervisión', formato: 'docx' },
+                { nombre: 'FICHA TÉCNICA', nomenclatura: 'FICHA TÉCNICA-{contrato}-{nombre}', requerido: true, descripcion: 'Ficha Técnica' },
+                { nombre: 'ACTA DE INICIO', nomenclatura: 'ACTA DE INICIO-{contrato}-{nombre}', requerido: true, descripcion: 'Acta de Inicio del Contrato' },
+                { nombre: 'INFORME DE SUPERVISIÓN', nomenclatura: 'INFORME DE SUPERVISIÓN-C1-{contrato}-{nombre}', requerido: true, descripcion: 'Informe de Supervisión', formato: 'docx' },
+                { nombre: 'CÉDULA', nomenclatura: 'CÉDULA-{contrato}-{nombre}', requerido: true, descripcion: 'Cédula de Ciudadanía' },
+                { nombre: 'RUT', nomenclatura: 'RUT-{contrato}-{nombre}', requerido: true, descripcion: 'Registro Único Tributario' },
+                { nombre: 'SEGURIDAD SOCIAL', nomenclatura: 'SEGURIDAD SOCIAL-C1-{nombre}', requerido: true, descripcion: 'Seguridad Social' },
+                { nombre: 'PANTALLAZO SECOP II', nomenclatura: 'PANTALLAZO SECOP II-{contrato}-{nombre}', requerido: true, descripcion: 'Pantallazo SECOP II' },
+                { nombre: 'INFORME DE GESTIÓN', nomenclatura: 'INFORME DE GESTIÓN-C1-{contrato}-{nombre}', requerido: true, descripcion: 'Informe de Gestión', formato: 'docx' },
+                { nombre: 'CERTIFICADO DE DEPENDIENTES', nomenclatura: 'CERTIFICADO DE DEPENDIENTES-C1-{nombre}', requerido: false, descripcion: 'Certificado de Dependientes (si aplica)' }
+            ],
+            C2: [
+                { nombre: 'DS', nomenclatura: 'DS-4162-02-{contrato}-{nombre}', requerido: true, descripcion: 'Designación de Supervisión', formato: 'docx' },
+                { nombre: 'INFORME DE SUPERVISIÓN', nomenclatura: 'INFORME DE SUPERVISIÓN-C2-{contrato}-{nombre}', requerido: true, descripcion: 'Informe de Supervisión', formato: 'docx' },
+                { nombre: 'SEGURIDAD SOCIAL', nomenclatura: 'SEGURIDAD SOCIAL-C2-{nombre}', requerido: true, descripcion: 'Seguridad Social' },
+                { nombre: 'INFORME DE GESTIÓN', nomenclatura: 'INFORME DE GESTIÓN-C2-{contrato}-{nombre}', requerido: true, descripcion: 'Informe de Gestión', formato: 'docx' },
+                { nombre: 'RPC', nomenclatura: 'RPC-{contrato}-{nombre}', requerido: true, descripcion: 'Registro Presupuestal del Compromiso' }
+            ],
+            C3: [
+                { nombre: 'DS', nomenclatura: 'DS-4162-03-{contrato}-{nombre}', requerido: true, descripcion: 'Designación de Supervisión', formato: 'docx' },
+                { nombre: 'INFORME DE SUPERVISIÓN', nomenclatura: 'INFORME DE SUPERVISIÓN-C3-{contrato}-{nombre}', requerido: true, descripcion: 'Informe de Supervisión', formato: 'docx' },
+                { nombre: 'SEGURIDAD SOCIAL', nomenclatura: 'SEGURIDAD SOCIAL-C3-{nombre}', requerido: true, descripcion: 'Seguridad Social' },
+                { nombre: 'INFORME DE GESTIÓN', nomenclatura: 'INFORME DE GESTIÓN-C3-{contrato}-{nombre}', requerido: true, descripcion: 'Informe de Gestión', formato: 'docx' },
+                { nombre: 'RPC', nomenclatura: 'RPC-{contrato}-{nombre}', requerido: true, descripcion: 'Registro Presupuestal del Compromiso' }
+            ],
+            C4: [
+                { nombre: 'DS', nomenclatura: 'DS-4162-04-{contrato}-{nombre}', requerido: true, descripcion: 'Designación de Supervisión', formato: 'docx' },
+                { nombre: 'INFORME DE SUPERVISIÓN', nomenclatura: 'INFORME DE SUPERVISIÓN-C4-{contrato}-{nombre}', requerido: true, descripcion: 'Informe de Supervisión', formato: 'docx' },
+                { nombre: 'SEGURIDAD SOCIAL', nomenclatura: 'SEGURIDAD SOCIAL-C4-{nombre}', requerido: true, descripcion: 'Seguridad Social' },
+                { nombre: 'INFORME DE GESTIÓN', nomenclatura: 'INFORME DE GESTIÓN-C4-{contrato}-{nombre}', requerido: true, descripcion: 'Informe de Gestión', formato: 'docx' },
+                { nombre: 'RPC', nomenclatura: 'RPC-{contrato}-{nombre}', requerido: true, descripcion: 'Registro Presupuestal del Compromiso' }
+            ]
+        };
+
+        // ============================================================================
+        // FUNCIONES DE NAVEGACIÓN
+        // ============================================================================
+
+        function mostrarPantalla(pantallaId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(pantallaId).classList.add('active');
+        }
+
+        function verificarCedula() {
+            const cedula = document.getElementById('cedula').value.trim();
+            const alertDiv = document.getElementById('alertLogin');
+
+            if (!cedula) {
+                alertDiv.innerHTML = '<div class="alert alert-error">Por favor ingresa tu número de cédula</div>';
+                return;
+            }
+
+            // Buscar contratista en la base de datos
+            const contratista = DATABASE_CONTRATISTAS.find(c => c.cedula === cedula);
+
+            if (!contratista) {
+                alertDiv.innerHTML = `
+                    <div class="alert alert-error">
+                        <strong>Cédula no encontrada</strong><br>
+                        No encontramos tu cédula en nuestra base de datos. Por favor verifica el número o contacta a tu coordinador.
+                    </div>
+                `;
+                return;
+            }
+
+            // Guardar contratista actual
+            contratistaActual = contratista;
+
+            // Mostrar datos
+            mostrarDatosContratista();
+        }
+
+        function mostrarDatosContratista() {
+            document.getElementById('dataNombre').textContent = contratistaActual.nombre;
+            document.getElementById('dataCedula').textContent = contratistaActual.cedula;
+            document.getElementById('dataContrato').textContent = contratistaActual.contrato_completo;
+            document.getElementById('dataRol').textContent = contratistaActual.rol;
+            document.getElementById('dataTelefono').textContent = contratistaActual.telefono;
+            document.getElementById('dataCorreo').textContent = contratistaActual.correo;
+            document.getElementById('dataDireccion').textContent = contratistaActual.direccion;
+
+            mostrarPantalla('screenData');
+        }
+
+        function actualizarDocumentos() {
+            const cuota = document.getElementById('selectCuota').value;
+            document.getElementById('btnContinuar').disabled = !cuota;
+        }
+
+        function irACargaDocumentos() {
+            const cuota = document.getElementById('selectCuota').value;
+            
+            if (!cuota) {
+                alert('Por favor selecciona una cuota');
+                return;
+            }
+
+            document.getElementById('uploadCuota').textContent = cuota;
+            documentosRequeridos = CONFIG_DOCUMENTOS[cuota];
+            archivosSubidos = {};
+
+            generarFormularioCarga();
+            mostrarPantalla('screenUpload');
+        }
+
+        function volverADatos() {
+            mostrarPantalla('screenData');
+        }
+
+        function cerrarSesion() {
+            if (confirm('¿Estás seguro que deseas salir?')) {
+                location.reload();
+            }
+        }
+
+        // ============================================================================
+        // GENERACIÓN DE FORMULARIO DE CARGA
+        // ============================================================================
+
+        function generarFormularioCarga() {
+            const container = document.getElementById('documentsContainer');
+            let html = '';
+
+            documentosRequeridos.forEach((doc, index) => {
+                const nombreEsperado = generarNombreArchivo(doc.nomenclatura);
+                const idDoc = `doc${index}`;
+                const badgeClass = doc.requerido ? 'status-pending' : 'status-pending';
+                const badgeText = doc.requerido ? 'OBLIGATORIO' : 'OPCIONAL';
+                const formatoBadge = doc.formato === 'docx' 
+                    ? '<span class="badge-docx">📝 WORD (.docx)</span>' 
+                    : '<span class="badge-pdf">📄 PDF/IMG</span>';
+
+                html += `
+                    <div class="doc-item missing" id="item${index}">
+                        <div class="doc-header">
+                            <div class="doc-name">${doc.nombre}</div>
+                            <span class="doc-status ${badgeClass}" id="status${index}">${badgeText}</span>
+                        </div>
+                        <div class="doc-nomenclature">📝 ${nombreEsperado}</div>
+                        <div class="file-input-wrapper">
+                            <label class="file-input-custom" for="${idDoc}">
+                                📎 Seleccionar Archivo
+                            </label>
+                            <button class="btn-preview" id="btnPreview${index}" onclick="previsualizarArchivo(${index})" disabled>
+                                👁️ Vista Previa
+                            </button>
+                            <input 
+                                type="file" 
+                                id="${idDoc}" 
+                                class="file-input"
+                                accept="${doc.formato === 'docx' ? '.docx,.doc' : '.pdf,.jpg,.jpeg,.png'}"
+                                onchange="manejarArchivo(${index}, this)"
+                            >
+                            <div class="file-info" id="info${index}"></div>
+                            <div id="validation${index}"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function generarNombreArchivo(nomenclatura) {
+            return nomenclatura
+                .replace('{nombre}', contratistaActual.nombre.trim())
+                .replace('{contrato}', contratistaActual.contrato);
+        }
+
+        function manejarArchivo(index, input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const doc = documentosRequeridos[index];
+            const nombreEsperado = generarNombreArchivo(doc.nomenclatura);
+            
+            // Validar tamaño (10 MB)
+            if (file.size > 10 * 1024 * 1024) {
+                mostrarValidacion(index, 'error', '❌ El archivo es demasiado grande. Máximo 10 MB.');
+                input.value = '';
+                return;
+            }
+
+            // VALIDACIÓN ESTRICTA DE NOMENCLATURA
+            const resultadoValidacion = validarNomenclaturaEstricta(file.name, nombreEsperado, index);
+            
+            if (!resultadoValidacion.valido) {
+                mostrarValidacion(index, 'error', resultadoValidacion.mensaje);
+                
+                // Ofrecer renombrar
+                const validationDiv = document.getElementById(`validation${index}`);
+                validationDiv.innerHTML += `
+                    <button class="btn-rename" onclick="renombrarYSubir(${index}, '${nombreEsperado}')">
+                        🔧 Renombrar a: ${nombreEsperado}.${obtenerExtension(file.name)}
+                    </button>
+                `;
+                
+                // No guardar el archivo aún
+                return;
+            }
+
+            // Si pasa validación, guardar archivo
+            guardarArchivo(index, file);
+        }
+
+        function validarNomenclaturaEstricta(nombreArchivo, nombreEsperado, index) {
+            const nombreSinExt = nombreArchivo.replace(/\.[^/.]+$/, '').trim();
+            const nombreEsperadoNormalizado = nombreEsperado.trim();
+            
+            // Normalizar: quitar espacios extras pero mantener estructura
+            const normalizar = (str) => str.replace(/\s+/g, ' ').toUpperCase();
+            
+            const archivoNorm = normalizar(nombreSinExt);
+            const esperadoNorm = normalizar(nombreEsperadoNormalizado);
+
+            // Validación ESTRICTA
+            if (archivoNorm !== esperadoNorm) {
+                // Validar partes específicas
+                const partesArchivo = archivoNorm.split('-');
+                const partesEsperadas = esperadoNorm.split('-');
+                
+                let mensajeError = `<strong>❌ El nombre del archivo no coincide con lo esperado</strong><br><br>`;
+                mensajeError += `<strong>Esperado:</strong> ${nombreEsperado}<br>`;
+                mensajeError += `<strong>Recibido:</strong> ${nombreSinExt}<br><br>`;
+                
+                // Detectar qué parte está mal
+                if (partesArchivo.length !== partesEsperadas.length) {
+                    mensajeError += `⚠️ Formato incorrecto. Debe tener el formato exacto con guiones.<br>`;
+                } else {
+                    // Validar número de contrato
+                    const contratoEsperado = contratistaActual.contrato;
+                    if (!archivoNorm.includes(contratoEsperado)) {
+                        mensajeError += `⚠️ Número de contrato incorrecto. Debe ser: <strong>${contratoEsperado}</strong><br>`;
+                    }
+                    
+                    // Validar nombre
+                    const nombreContratista = normalizar(contratistaActual.nombre);
+                    if (!archivoNorm.includes(nombreContratista)) {
+                        mensajeError += `⚠️ Nombre incorrecto. Debe ser: <strong>${contratistaActual.nombre}</strong><br>`;
+                    }
+                }
+                
+                return {
+                    valido: false,
+                    mensaje: mensajeError
+                };
+            }
+
+            return {
+                valido: true,
+                mensaje: '✓ Nombre del archivo correcto'
+            };
+        }
+
+        function renombrarYSubir(index, nombreEsperado) {
+            const input = document.getElementById(`doc${index}`);
+            const file = input.files[0];
+            
+            if (!file) return;
+            
+            const extension = obtenerExtension(file.name);
+            const nuevoNombre = `${nombreEsperado}.${extension}`;
+            
+            // Crear nuevo archivo con nombre correcto
+            const nuevoArchivo = new File([file], nuevoNombre, { type: file.type });
+            
+            // Mostrar confirmación
+            mostrarValidacion(index, 'success', `✓ Archivo renombrado a: ${nuevoNombre}`);
+            
+            // Guardar
+            guardarArchivo(index, nuevoArchivo);
+        }
+
+        function obtenerExtension(nombreArchivo) {
+            return nombreArchivo.split('.').pop().toLowerCase();
+        }
+
+        function guardarArchivo(index, file) {
+            // Guardar archivo
+            archivosSubidos[index] = file;
+
+            // Habilitar botón de vista previa
+            document.getElementById(`btnPreview${index}`).disabled = false;
+
+            // Actualizar UI
+            const item = document.getElementById(`item${index}`);
+            const status = document.getElementById(`status${index}`);
+            const info = document.getElementById(`info${index}`);
+
+            item.classList.remove('missing');
+            item.classList.add('uploaded');
+            status.textContent = '✓ CARGADO';
+            status.className = 'doc-status status-uploaded';
+
+            const extension = file.name.split('.').pop().toUpperCase();
+            const sizeKB = (file.size / 1024).toFixed(1);
+
+            info.innerHTML = `
+                <div style="display: flex; align-items: center;">
+                    <span class="file-icon">${extension}</span>
+                    <span>${file.name} (${sizeKB} KB)</span>
+                </div>
+                <button class="btn-remove" onclick="eliminarArchivo(${index})">Eliminar</button>
+            `;
+            info.classList.add('show');
+
+            mostrarValidacion(index, 'success', '✓ Archivo validado y cargado correctamente');
+            
+            verificarDocumentosCompletos();
+        }
+
+        function mostrarValidacion(index, tipo, mensaje) {
+            const validationDiv = document.getElementById(`validation${index}`);
+            const clases = {
+                'error': 'validation-error',
+                'success': 'validation-success',
+                'warning': 'validation-warning'
+            };
+            
+            validationDiv.innerHTML = `<div class="${clases[tipo]}">${mensaje}</div>`;
+        }
+
+        function previsualizarArchivo(index) {
+            const file = archivosSubidos[index];
+            if (!file) return;
+
+            const extension = obtenerExtension(file.name);
+            const url = URL.createObjectURL(file);
+
+            if (extension === 'pdf') {
+                // Abrir PDF en nueva pestaña
+                window.open(url, '_blank');
+            } else if (['jpg', 'jpeg', 'png'].includes(extension)) {
+                // Mostrar imagen en modal
+                mostrarImagenEnModal(url, file.name);
+            } else {
+                // Para DOC, XLS, etc - mostrar confirmación
+                alert(`✓ Documento cargado: ${file.name}\nTipo: ${file.type}\nTamaño: ${(file.size / 1024).toFixed(1)} KB`);
+            }
+        }
+
+        function mostrarImagenEnModal(url, nombre) {
+            const modal = document.getElementById('previewModal');
+            const img = document.getElementById('previewImage');
+            const caption = document.getElementById('previewCaption');
+            
+            img.src = url;
+            caption.textContent = nombre;
+            modal.classList.add('show');
+        }
+
+        function cerrarModal() {
+            document.getElementById('previewModal').classList.remove('show');
+        }
+
+        function eliminarArchivo(index) {
+            delete archivosSubidos[index];
+            
+            const input = document.getElementById(`doc${index}`);
+            const item = document.getElementById(`item${index}`);
+            const status = document.getElementById(`status${index}`);
+            const info = document.getElementById(`info${index}`);
+            const validation = document.getElementById(`validation${index}`);
+            const btnPreview = document.getElementById(`btnPreview${index}`);
+
+            input.value = '';
+            item.classList.remove('uploaded');
+            item.classList.add('missing');
+            
+            const doc = documentosRequeridos[index];
+            status.textContent = doc.requerido ? 'OBLIGATORIO' : 'OPCIONAL';
+            status.className = 'doc-status status-pending';
+            
+            info.classList.remove('show');
+            info.innerHTML = '';
+            if (validation) validation.innerHTML = '';
+            if (btnPreview) btnPreview.disabled = true;
+
+            verificarDocumentosCompletos();
+        }
+
+        function verificarDocumentosCompletos() {
+            const obligatorios = documentosRequeridos.filter(d => d.requerido);
+            const obligatoriosSubidos = obligatorios.filter((_, i) => archivosSubidos[i]);
+
+            const progress = (obligatoriosSubidos.length / obligatorios.length) * 100;
+            document.getElementById('uploadProgress').style.width = progress + '%';
+
+            const todosSubidos = obligatoriosSubidos.length === obligatorios.length;
+            document.getElementById('btnEnviar').disabled = !todosSubidos;
+
+            const alertDiv = document.getElementById('alertUpload');
+            if (todosSubidos) {
+                alertDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>✓ Todos los documentos obligatorios están cargados</strong><br>
+                        Puedes enviar tu cuenta de cobro ahora.
+                    </div>
+                `;
+            } else {
+                const faltantes = obligatorios.length - obligatoriosSubidos.length;
+                alertDiv.innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>Faltan ${faltantes} documento(s) obligatorio(s)</strong><br>
+                        Debes cargar todos los documentos obligatorios antes de enviar.
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================================================
+        // ENVÍO DE DOCUMENTOS
+        // ============================================================================
+
+        async function enviarDocumentos() {
+            if (!confirm('¿Estás seguro de enviar tus documentos? Verifica que toda la información sea correcta.')) {
+                return;
+            }
+
+            mostrarPantalla('loadingScreen');
+            document.getElementById('loadingScreen').classList.add('active');
+
+            try {
+                // PASO 1: Autenticar con Google
+                document.getElementById('loadingText').textContent = 'Conectando con Google Drive...';
+                const token = await autenticarConGoogle();
+
+                // PASO 2: Subir archivos a Drive
+                const cuota = document.getElementById('selectCuota').value;
+                const resultado = await subirAGoogleDrive(archivosSubidos, contratistaActual, cuota, token);
+
+                // PASO 3: Mostrar éxito
+                const trackingNumber = generarNumeroSeguimiento(cuota);
+                document.getElementById('loadingScreen').classList.remove('active');
+                document.getElementById('trackingNumber').textContent = trackingNumber;
+
+                // Mostrar link a carpeta de Drive
+                if (resultado.linkCarpeta) {
+                    document.getElementById('trackingNumber').innerHTML += 
+                        `<br><br><a href="${resultado.linkCarpeta}" target="_blank" 
+                        style="color:#2a5298; font-size:14px;">
+                        📁 Ver carpeta en Google Drive</a>`;
+                }
+
+                mostrarPantalla('screenSuccess');
+
+            } catch (error) {
+                document.getElementById('loadingScreen').classList.remove('active');
+                console.error('Error:', error);
+                alert('Error al subir archivos: ' + error.message + '\n\nVerifica tu conexión e intenta de nuevo.');
+                mostrarPantalla('screenUpload');
+            }
+        }
+
+        function generarNumeroSeguimiento(cuota) {
+            const ahora = new Date();
+            const fecha = ahora.toISOString().slice(0,10).replace(/-/g,'');
+            const hora = ahora.toTimeString().slice(0,8).replace(/:/g,'');
+            return `${cuota}-${contratistaActual.contrato}-${fecha}-${hora}`;
+        }
+
+        // ============================================================================
+        // GOOGLE DRIVE - AUTENTICACIÓN OAuth 2.0
+        // ============================================================================
+
+        // ===== CONFIGURACIÓN GOOGLE =====
+        const GOOGLE_CLIENT_ID = '8864914070-34rk6mkg8dll6sai713fud1dv28bavrc.apps.googleusercontent.com';
+        const GOOGLE_API_KEY   = 'AIzaSyBlS8ZERtUhFFbqVvKuV85O3oaap9thoCQ';
+        const GOOGLE_SCOPES    = 'https://www.googleapis.com/auth/drive.file';
+        let accessToken  = null;
+        let gapiInited   = false;
+        let gisInited    = false;
+        let tokenClient  = null;
+
+        // Cargar librerías Google al iniciar
+        window.addEventListener('DOMContentLoaded', () => {
+            const s1 = document.createElement('script');
+            s1.src = 'https://apis.google.com/js/api.js';
+            s1.onload = () => {
+                gapi.load('client', async () => {
+                    await gapi.client.init({
+                        apiKey: GOOGLE_API_KEY,
+                        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+                    });
+                    gapiInited = true;
+                    console.log('✓ GAPI listo');
+                });
+            };
+            document.head.appendChild(s1);
+
+            const s2 = document.createElement('script');
+            s2.src = 'https://accounts.google.com/gsi/client';
+            s2.onload = () => {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: GOOGLE_CLIENT_ID,
+                    scope: GOOGLE_SCOPES,
+                    callback: '',
+                });
+                gisInited = true;
+                console.log('✓ GIS listo');
+            };
+            document.head.appendChild(s2);
+        });
+
+        // ============================================================
+        // EVIDENCIAS Y OBSERVACIONES
+        // ============================================================
+        let evidencias = [];
+        let observaciones = [];
+        let contadorEv = 0;
+        let contadorObs = 0;
+
+        function agregarEvidencia() {
+            contadorEv++;
+            const id = `ev_${contadorEv}`;
+            evidencias.push({ id, archivo: null });
+            const div = document.createElement('div');
+            div.className = 'evidencia-item';
+            div.id = `div_${id}`;
+            div.innerHTML = `
+                <label>Evidencia ${contadorEv}:</label>
+                <input type="file" id="${id}" accept="*/*" 
+                    onchange="cargarEvidencia('${id}')" style="flex:1; font-size:12px;">
+                <span class="ev-name" id="name_${id}">Sin archivo</span>
+                <button onclick="eliminarEvidencia('${id}')" 
+                    style="background:#c62828;color:white;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;">✕</button>
+            `;
+            document.getElementById('listaEvidencias').appendChild(div);
+        }
+
+        function cargarEvidencia(id) {
+            const input = document.getElementById(id);
+            const file = input.files[0];
+            if (!file) return;
+            const ev = evidencias.find(e => e.id === id);
+            if (ev) ev.archivo = file;
+            document.getElementById(`name_${id}`).textContent = file.name;
+        }
+
+        function eliminarEvidencia(id) {
+            evidencias = evidencias.filter(e => e.id !== id);
+            document.getElementById(`div_${id}`).remove();
+        }
+
+        function agregarObservacion() {
+            contadorObs++;
+            const id = `obs_${contadorObs}`;
+            observaciones.push({ id, archivo: null });
+            const div = document.createElement('div');
+            div.className = 'evidencia-item';
+            div.id = `div_${id}`;
+            div.innerHTML = `
+                <label>Corrección ${contadorObs}:</label>
+                <input type="file" id="${id}" accept=".pdf,.docx,.doc,.jpg,.jpeg,.png"
+                    onchange="cargarObservacion('${id}')" style="flex:1; font-size:12px;">
+                <span class="ev-name" id="name_${id}">Sin archivo</span>
+                <button onclick="eliminarObservacion('${id}')" 
+                    style="background:#c62828;color:white;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;">✕</button>
+            `;
+            document.getElementById('listaObservaciones').appendChild(div);
+        }
+
+        function cargarObservacion(id) {
+            const input = document.getElementById(id);
+            const file = input.files[0];
+            if (!file) return;
+            // Validar docx para los 3 documentos especiales
+            const nombre = file.name.toUpperCase();
+            const esDocEspecial = nombre.startsWith('DS-') || 
+                                  nombre.startsWith('INFORME DE SUPERVISIÓN') || 
+                                  nombre.startsWith('INFORME DE GESTIÓN');
+            if (esDocEspecial) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (!['docx','doc'].includes(ext)) {
+                    alert(`❌ El documento "${file.name}" debe estar en formato Word (.docx)`);
+                    input.value = '';
+                    return;
+                }
+            }
+            const obs = observaciones.find(o => o.id === id);
+            if (obs) obs.archivo = file;
+            document.getElementById(`name_${id}`).textContent = file.name;
+        }
+
+        function eliminarObservacion(id) {
+            observaciones = observaciones.filter(o => o.id !== id);
+            document.getElementById(`div_${id}`).remove();
+        }
+
+        async function autenticarConGoogle() {
+            if (accessToken) return accessToken;
+
+            // Esperar que las librerías carguen (máx 10 segundos)
+            let intentos = 0;
+            while ((!gapiInited || !gisInited) && intentos < 20) {
+                await new Promise(r => setTimeout(r, 500));
+                intentos++;
+            }
+            if (!gapiInited || !gisInited) {
+                throw new Error('No se cargaron las librerías de Google. Verifica tu conexión a internet.');
+            }
+
+            return new Promise((resolve, reject) => {
+                tokenClient.callback = (response) => {
+                    if (response.error) {
+                        reject(new Error('Error de autenticación: ' + response.error));
+                        return;
+                    }
+                    accessToken = response.access_token;
+                    gapi.client.setToken({ access_token: accessToken });
+                    resolve(accessToken);
+                };
+                if (gapi.client.getToken() === null) {
+                    tokenClient.requestAccessToken({ prompt: 'consent' });
+                } else {
+                    tokenClient.requestAccessToken({ prompt: '' });
+                }
+            });
+        }
+
+        // ============================================================================
+        // GOOGLE DRIVE - SUBIDA DE ARCHIVOS
+        // ============================================================================
+
+        async function subirAGoogleDrive(archivos, contratista, cuota, token) {
+            const totalArchivos = Object.keys(archivos).length;
+            let subidos = 0;
+
+            // PASO 1: Crear/buscar carpeta principal CUENTAS_DEPORVIDA_1S_2026
+            document.getElementById('loadingText').textContent = 'Creando carpeta principal...';
+            const carpetaPrincipalId = await crearOBuscarCarpeta(
+                'CUENTAS_DEPORVIDA_1S_2026', 
+                null, 
+                token
+            );
+
+            // PASO 2: Crear carpeta del contratista: 0479-JORGE ARMANDO HOYOS FERNANDEZ
+            const nombreCarpetaContratista = `${contratista.contrato}-${contratista.nombre}`;
+            document.getElementById('loadingText').textContent = `Creando carpeta de ${contratista.nombre}...`;
+            const carpetaContratistaId = await crearOBuscarCarpeta(
+                nombreCarpetaContratista,
+                carpetaPrincipalId,
+                token
+            );
+
+            // PASO 3: Crear subcarpeta de cuota: C1, C2, C3, C4
+            document.getElementById('loadingText').textContent = `Creando carpeta ${cuota}...`;
+            const carpetaCuotaId = await crearOBuscarCarpeta(
+                cuota,
+                carpetaContratistaId,
+                token
+            );
+
+            // PASO 4: Subir cada archivo
+            for (const index in archivos) {
+                const archivo = archivos[index];
+                subidos++;
+                const progreso = Math.round((subidos / totalArchivos) * 100);
+
+                document.getElementById('loadingText').textContent = 
+                    `Subiendo ${subidos} de ${totalArchivos}: ${archivo.name} (${progreso}%)`;
+
+                await subirArchivo(archivo, carpetaCuotaId, token);
+            }
+
+            // PASO 5: Subir Evidencias en subcarpeta propia
+            const evs = evidencias.filter(e => e.archivo !== null);
+            if (evs.length > 0) {
+                document.getElementById('loadingText').textContent = 'Subiendo evidencias...';
+                const carpetaEvId = await crearOBuscarCarpeta(
+                    `Evidencias-${cuota}`, carpetaContratistaId, token
+                );
+                for (const ev of evs) {
+                    await subirArchivo(ev.archivo, carpetaEvId, token);
+                }
+            }
+
+            // PASO 6: Subir Observaciones en subcarpeta propia
+            const obs = observaciones.filter(o => o.archivo !== null);
+            if (obs.length > 0) {
+                document.getElementById('loadingText').textContent = 'Subiendo observaciones...';
+                const carpetaObsId = await crearOBuscarCarpeta(
+                    'OBSERVACIONES', carpetaContratistaId, token
+                );
+                for (const ob of obs) {
+                    await subirArchivo(ob.archivo, carpetaObsId, token);
+                }
+            }
+
+            // PASO 7: Obtener link de la carpeta
+            const linkCarpeta = `https://drive.google.com/drive/folders/${carpetaCuotaId}`;
+
+            return { 
+                exitoso: true, 
+                linkCarpeta,
+                carpetaId: carpetaCuotaId
+            };
+        }
+
+        async function crearOBuscarCarpeta(nombre, padreId, token) {
+            // Buscar si ya existe la carpeta
+            let query = `name='${nombre}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+            if (padreId) {
+                query += ` and '${padreId}' in parents`;
+            }
+
+            const busqueda = await fetch(
+                `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`,
+                { headers: { 'Authorization': `Bearer ${token}` } }
+            );
+            const resultadoBusqueda = await busqueda.json();
+
+            // Si existe, retornar su ID
+            if (resultadoBusqueda.files && resultadoBusqueda.files.length > 0) {
+                return resultadoBusqueda.files[0].id;
+            }
+
+            // Si no existe, crearla
+            const metadata = {
+                name: nombre,
+                mimeType: 'application/vnd.google-apps.folder',
+                parents: padreId ? [padreId] : []
+            };
+
+            const creacion = await fetch(
+                'https://www.googleapis.com/drive/v3/files',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(metadata)
+                }
+            );
+            const carpeta = await creacion.json();
+            return carpeta.id;
+        }
+
+        async function subirArchivo(archivo, carpetaId, token) {
+            // Crear metadata del archivo
+            const metadata = {
+                name: archivo.name,
+                parents: [carpetaId]
+            };
+
+            // Crear FormData con metadata y archivo
+            const form = new FormData();
+            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            form.append('file', archivo);
+
+            const respuesta = await fetch(
+                'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',
+                {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: form
+                }
+            );
+
+            if (!respuesta.ok) {
+                const error = await respuesta.json();
+                throw new Error(`Error subiendo ${archivo.name}: ${error.error?.message}`);
+            }
+
+            return await respuesta.json();
+        }
+    </script>
+</body>
+</html>
