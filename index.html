@@ -597,6 +597,22 @@
                         >
                     </div>
 
+                    <div class="form-group">
+                        <label>¿Qué vas a radicar?</label>
+                        <div style="display:flex; gap:12px; margin-top:8px;">
+                            <label class="tipo-btn" id="tipoCuenta" onclick="seleccionarTipo('cuenta')" style="flex:1; border:2px solid #ddd; border-radius:12px; padding:14px 10px; text-align:center; cursor:pointer; transition:all 0.2s;">
+                                <div style="font-size:28px;">📄</div>
+                                <div style="font-weight:700; color:#1e3c72; margin-top:4px;">Cuenta de Cobro</div>
+                                <div style="font-size:11px; color:#888; margin-top:2px;">Cuotas 1, 2, 3 o 4</div>
+                            </label>
+                            <label class="tipo-btn" id="tipoObservaciones" onclick="seleccionarTipo('observaciones')" style="flex:1; border:2px solid #ddd; border-radius:12px; padding:14px 10px; text-align:center; cursor:pointer; transition:all 0.2s;">
+                                <div style="font-size:28px;">⚠️</div>
+                                <div style="font-weight:700; color:#e65100; margin-top:4px;">Observaciones</div>
+                                <div style="font-size:11px; color:#888; margin-top:2px;">Correcciones solicitadas</div>
+                            </label>
+                        </div>
+                    </div>
+
                     <button class="btn btn-primary" onclick="verificarCedula()">
                         Ingresar →
                     </button>
@@ -684,12 +700,31 @@
 
                 <div id="alertUpload"></div>
 
+                <!-- SECCIÓN EVIDENCIAS - siempre visible -->
+                <div class="section-evidencias" id="seccionEvidencias">
+                    <h3>📸 Evidencias</h3>
+                    <p class="desc">Sube fotos, videos u archivos que soporten tus actividades. 
+                    Cualquier formato. Se guardarán en subcarpeta <strong>Evidencias-CX</strong> en Drive.</p>
+                    <div id="listaEvidencias"></div>
+                    <button class="btn-add-evidencia" onclick="agregarEvidencia()">+ Agregar Evidencia</button>
+                </div>
+
+                <!-- SECCIÓN OBSERVACIONES - visible solo si eligió observaciones -->
+                <div class="section-observaciones" id="seccionObservaciones" style="display:none;">
+                    <h3>⚠️ Documentos con Observaciones</h3>
+                    <p class="desc">Sube aquí los documentos corregidos. 
+                    DS, Informe de Supervisión e Informe de Gestión deben ser <strong>Word (.docx)</strong>. 
+                    Van a carpeta <strong>OBSERVACIONES</strong> en Drive.</p>
+                    <div id="listaObservaciones"></div>
+                    <button class="btn-add-evidencia" style="background:#e65100;" onclick="agregarObservacion()">+ Agregar Corrección</button>
+                </div>
+
                 <div class="buttons">
                     <button class="btn btn-secondary" onclick="volverADatos()">
                         ← Atrás
                     </button>
                     <button class="btn btn-primary" onclick="enviarDocumentos()" id="btnEnviar" disabled>
-                        Enviar Documentos 🚀
+                        📤 Enviar Documentos
                     </button>
                 </div>
             </div>
@@ -856,6 +891,16 @@
         }
 
         function irACargaDocumentos() {
+            // Mostrar/ocultar secciones según tipo
+            const secObs = document.getElementById('seccionObservaciones');
+            const titulo = document.querySelector('#screenUpload h2');
+            if (tipoRadicacion === 'observaciones') {
+                secObs.style.display = 'block';
+                if (titulo) titulo.textContent = '⚠️ Cargar Correcciones';
+            } else {
+                secObs.style.display = 'none';
+                if (titulo) titulo.textContent = '📤 Cargar Documentos';
+            }
             const cuota = document.getElementById('selectCuota').value;
             
             if (!cuota) {
@@ -1277,6 +1322,24 @@
         let observaciones = [];
         let contadorEv = 0;
         let contadorObs = 0;
+        let tipoRadicacion = 'cuenta'; // 'cuenta' u 'observaciones'
+
+        function seleccionarTipo(tipo) {
+            tipoRadicacion = tipo;
+            const btnCuenta = document.getElementById('tipoCuenta');
+            const btnObs = document.getElementById('tipoObservaciones');
+            if (tipo === 'cuenta') {
+                btnCuenta.style.border = '2px solid #2a5298';
+                btnCuenta.style.background = '#e8f0fe';
+                btnObs.style.border = '2px solid #ddd';
+                btnObs.style.background = 'white';
+            } else {
+                btnObs.style.border = '2px solid #e65100';
+                btnObs.style.background = '#fff3e0';
+                btnCuenta.style.border = '2px solid #ddd';
+                btnCuenta.style.background = 'white';
+            }
+        }
 
         function agregarEvidencia() {
             contadorEv++;
